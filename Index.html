@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Authentic AI Disclosure — A Badging System by Marc Watkins</title>
+<meta name="description" content="A digital badging system that helps students authentically disclose how they used AI — honest, proportionate, and free of performative or exhaustive disclosure. Modeled on Monash University. Built by Marc Watkins." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<style>
+:root{
+  --cream:#F5EDD8; --cream-d:#EDE0C4;
+  --red:#C23529;
+  --blue:#1B3D85; --blue-d:#132D65;
+  --gold:#D4910A; --gold-lt:#E8A820;
+  --green:#2F6B4F;
+  --navy:#1A1D2E; --navy-s:#3A3D52; --gray:#6B6E7E;
+  --white:#FFFFFF; --shadow:rgba(26,29,46,.22);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:var(--cream);color:var(--navy);
+  -webkit-font-smoothing:antialiased;line-height:1.5;
+  background-image:radial-gradient(rgba(26,29,46,.025) 1px,transparent 1px);
+  background-size:4px 4px;
+}
+a{color:var(--blue);text-underline-offset:2px}
+a:hover{color:var(--blue-d)}
+
+/* ── NAV ── */
+nav{
+  display:flex;align-items:center;gap:24px;padding:13px 36px;
+  background:var(--cream);border-bottom:2.5px solid var(--navy);
+  position:sticky;top:0;z-index:30;flex-wrap:wrap;
+}
+.nav-logo{display:flex;align-items:center;gap:10px;flex:1;text-decoration:none;min-width:0}
+.logo-mark{width:40px;height:40px;background:var(--green);border-radius:8px;border:2.5px solid var(--navy);display:grid;place-items:center;flex-shrink:0}
+.logo-text{font-family:'Anton',sans-serif;font-size:14px;line-height:1.05;color:var(--navy);text-transform:uppercase;letter-spacing:.02em}
+.nav-links{display:flex;gap:22px;list-style:none;flex-wrap:wrap}
+.nav-links a{font-size:14px;font-weight:500;color:var(--navy);text-decoration:none;padding-bottom:2px;border-bottom:2px solid transparent;transition:border-color .18s}
+.nav-links a:hover{border-bottom-color:var(--navy)}
+.nav-cta{background:var(--blue);color:var(--white);border:2.5px solid var(--navy);border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:6px;transition:background .18s}
+.nav-cta:hover{background:var(--blue-d);color:#fff}
+
+/* ── LAYOUT ── */
+.wrap{max-width:1100px;margin:0 auto;padding:0 28px}
+section{padding:44px 0}
+
+/* ── HERO ── */
+.hero{padding:54px 0 30px}
+.kicker{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.14em;font-size:13px;color:var(--red);margin-bottom:14px}
+.hero h1{font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(44px,6.4vw,80px);line-height:.9;text-transform:uppercase;letter-spacing:.005em;margin-bottom:20px}
+.hero h1 .g{color:var(--green)}
+.hero h1 .b{color:var(--blue)}
+.hero-lead{font-size:clamp(16px,1.9vw,20px);max-width:740px;color:var(--navy-s);line-height:1.55}
+.hero-lead strong{color:var(--navy)}
+.credit-line{margin-top:22px;font-family:'Oswald',sans-serif;font-size:18px;font-weight:600;display:inline-block;border-bottom:3px solid var(--green);padding-bottom:3px}
+
+/* ── SECTION HEADINGS ── */
+.sec-kicker{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.14em;font-size:13px;color:var(--blue);margin-bottom:10px}
+.sec-title{font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(28px,3.6vw,42px);line-height:1.02;text-transform:uppercase;margin-bottom:14px}
+.sec-intro{font-size:16px;color:var(--navy-s);max-width:720px;margin-bottom:30px}
+
+/* ── PRINCIPLES ── */
+.principles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:8px}
+@media(max-width:760px){.principles{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.principles{grid-template-columns:1fr}}
+.principle{border:2.5px solid var(--navy);border-radius:12px;background:var(--white);padding:18px 16px;box-shadow:0 4px 0 var(--shadow)}
+.principle .pic{width:38px;height:38px;border-radius:9px;display:grid;place-items:center;margin-bottom:12px;color:#fff}
+.principle h3{font-family:'Oswald',sans-serif;font-size:18px;font-weight:600;margin-bottom:6px}
+.principle p{font-size:13.5px;color:var(--navy-s);line-height:1.45}
+
+/* ── TRAPS ── */
+.traps{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:34px}
+@media(max-width:700px){.traps{grid-template-columns:1fr}}
+.trap{border:2.5px solid var(--navy);border-radius:14px;padding:22px 22px 20px;box-shadow:0 5px 0 var(--shadow);background:var(--white)}
+.trap.perf{background:#FBEEE9}
+.trap.exh{background:#FBF4E1}
+.trap-tag{display:inline-flex;align-items:center;gap:7px;font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:13px;padding:5px 11px;border-radius:999px;border:2px solid var(--navy);margin-bottom:12px}
+.trap.perf .trap-tag{background:var(--red);color:#fff}
+.trap.exh .trap-tag{background:var(--gold);color:var(--navy)}
+.trap h3{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;text-transform:uppercase;margin-bottom:8px}
+.trap p{font-size:14.5px;color:var(--navy-s);margin-bottom:10px}
+.trap .ex{background:rgba(26,29,46,.05);border-left:3px solid var(--navy);padding:8px 12px;border-radius:0 8px 8px 0;font-style:italic;font-size:14px;color:var(--navy-s);margin:6px 0}
+.trap .fix{font-size:14px;margin-top:10px}
+.trap .fix strong{color:var(--navy)}
+
+/* ── BUILDER ── */
+.builder-band{background:var(--navy);color:var(--cream);border-top:3px solid #000;border-bottom:3px solid #000}
+.builder-band .sec-kicker{color:var(--gold-lt)}
+.builder-band .sec-title{color:#fff}
+.builder-band .sec-intro{color:#cdd0dd}
+.builder{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start}
+@media(max-width:860px){.builder{grid-template-columns:1fr}}
+
+.panel{background:var(--cream);color:var(--navy);border-radius:16px;border:2.5px solid #000;box-shadow:0 6px 0 rgba(0,0,0,.4);padding:22px}
+.panel h3.step{font-family:'Oswald',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin:0 0 4px;display:flex;align-items:center;gap:9px}
+.step-num{background:var(--green);color:#fff;width:24px;height:24px;border-radius:6px;display:grid;place-items:center;font-size:13px;flex-shrink:0;border:2px solid var(--navy)}
+.step-hint{font-size:13px;color:var(--gray);margin:0 0 14px 33px}
+
+.levels{display:grid;gap:10px;margin-bottom:6px}
+.level{display:flex;gap:12px;align-items:flex-start;border:2.5px solid var(--navy);border-radius:11px;background:var(--white);padding:12px 14px;cursor:pointer;transition:transform .12s,box-shadow .12s;position:relative}
+.level:hover{transform:translateY(-1px)}
+.level input{position:absolute;opacity:0;pointer-events:none}
+.level .swatch{width:34px;height:34px;border-radius:8px;flex-shrink:0;display:grid;place-items:center;color:#fff;border:2px solid var(--navy)}
+.level .ltext h4{font-family:'Oswald',sans-serif;font-size:15.5px;font-weight:600;line-height:1.1}
+.level .ltext p{font-size:12.5px;color:var(--navy-s);margin-top:2px}
+.level[data-active="true"]{box-shadow:0 0 0 3px var(--gold),0 4px 0 var(--shadow);background:#FFFDF4}
+
+label.fl{display:block;font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin:16px 0 5px}
+label.fl span{color:var(--gray);font-family:'Inter';font-weight:400;text-transform:none;letter-spacing:0;font-size:12px}
+input.tf,textarea.tf{width:100%;font-family:'Inter';font-size:14.5px;color:var(--navy);background:var(--white);border:2px solid var(--navy);border-radius:9px;padding:10px 12px}
+textarea.tf{resize:vertical;min-height:66px;line-height:1.45}
+input.tf:focus,textarea.tf:focus{outline:none;box-shadow:0 0 0 3px rgba(212,145,10,.4);border-color:var(--gold)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:500px){.two{grid-template-columns:1fr}}
+.muted-note{font-size:12.5px;color:var(--gray);margin-top:6px;line-height:1.4}
+
+/* ── BADGE ── */
+.preview-col{position:sticky;top:88px}
+@media(max-width:860px){.preview-col{position:static}}
+.preview-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.preview-head span{font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--gold-lt)}
+.live-dot{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#9aa0b5;font-weight:500}
+.live-dot i{width:7px;height:7px;border-radius:50%;background:#4ade80;display:inline-block;animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+#badge{background:var(--white);border:2.5px solid var(--navy);border-radius:16px;overflow:hidden;box-shadow:0 6px 0 rgba(0,0,0,.4)}
+.badge-top{padding:16px 20px;color:#fff;display:flex;align-items:center;gap:13px}
+.badge-top .bicon{width:42px;height:42px;border-radius:10px;background:rgba(255,255,255,.18);display:grid;place-items:center;flex-shrink:0;border:2px solid rgba(255,255,255,.5)}
+.badge-top .btitle{font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:12px;opacity:.92}
+.badge-top .blevel{font-family:'Anton',sans-serif;font-weight:400;font-size:21px;line-height:1.02;text-transform:uppercase}
+.badge-body{padding:20px}
+.badge-statement{font-size:16px;line-height:1.55;color:var(--navy);margin-bottom:16px}
+.badge-statement a{color:var(--blue);word-break:break-word}
+.badge-meta{border-top:1.5px dashed var(--cream-d);padding-top:14px;display:grid;gap:9px}
+.meta-row{display:grid;grid-template-columns:108px 1fr;gap:10px;font-size:13.5px;align-items:start}
+.meta-row .k{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.03em;font-size:11.5px;color:var(--gray);padding-top:1px}
+.meta-row .v{color:var(--navy);word-break:break-word}
+.badge-foot{background:var(--cream);border-top:1.5px solid var(--cream-d);padding:11px 20px;font-size:11px;color:var(--gray);line-height:1.45}
+.badge-foot b{color:var(--navy-s)}
+
+/* ── EXPORT BUTTONS ── */
+.exports{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.xbtn{flex:1 1 auto;min-width:120px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:'Oswald',sans-serif;font-weight:600;font-size:13.5px;text-transform:uppercase;letter-spacing:.03em;padding:11px 14px;border-radius:10px;border:2.5px solid var(--navy);background:var(--white);color:var(--navy);cursor:pointer;transition:transform .1s,background .15s}
+.xbtn:hover{transform:translateY(-1px)}
+.xbtn.primary{background:var(--green);color:#fff}
+.xbtn.blue{background:var(--blue);color:#fff}
+.xbtn svg{width:16px;height:16px;flex-shrink:0}
+.export-note{font-size:12px;color:#aab0c4;margin-top:10px;line-height:1.45;text-align:center}
+
+/* ── SELF-CHECK ── */
+.selfcheck{margin-top:18px;background:#11131f;border:1.5px solid #2a2d40;border-radius:12px;padding:14px 16px}
+.selfcheck h4{font-family:'Oswald',sans-serif;font-size:12.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--gold-lt);margin-bottom:9px}
+.selfcheck li{list-style:none;font-size:13px;color:#cdd0dd;display:flex;gap:8px;margin-bottom:6px;line-height:1.4}
+.selfcheck li svg{width:15px;height:15px;flex-shrink:0;margin-top:2px}
+
+/* ── MONASH MODEL ── */
+.model-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:6px}
+@media(max-width:700px){.model-grid{grid-template-columns:1fr}}
+.mcard{border:2.5px solid var(--navy);border-radius:14px;background:var(--white);padding:20px;box-shadow:0 4px 0 var(--shadow)}
+.mcard h3{font-family:'Oswald',sans-serif;font-size:17px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.mcard p,.mcard li{font-size:14px;color:var(--navy-s);line-height:1.5}
+.mcard ul{margin:8px 0 0 18px}
+.mcard li{margin-bottom:5px}
+.formula{background:var(--cream);border:2px dashed var(--navy-s);border-radius:10px;padding:13px 15px;font-size:15px;line-height:1.7;margin-top:14px}
+.formula .slot{background:#FFF3D1;border-bottom:2px solid var(--gold);padding:1px 5px;border-radius:3px;font-weight:600}
+
+/* ── FOOTER ── */
+footer{background:var(--navy);color:var(--cream);padding:40px 0 46px;border-top:3px solid #000}
+.foot-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:34px}
+@media(max-width:700px){.foot-grid{grid-template-columns:1fr}}
+footer h4{font-family:'Oswald',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--gold-lt);margin-bottom:12px}
+footer p{font-size:14px;color:#cdd0dd;line-height:1.6;margin-bottom:10px}
+footer a{color:#fff;text-decoration:underline;text-decoration-color:rgba(255,255,255,.4)}
+footer a:hover{color:var(--gold-lt)}
+.sources li{list-style:none;font-size:13.5px;margin-bottom:9px;color:#cdd0dd;line-height:1.45}
+.sources li b{color:#fff}
+.attrib{margin-top:26px;border-top:1px solid #2a2d40;padding-top:18px;font-size:12.5px;color:#9aa0b5}
+
+/* ── TOAST ── */
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;border:2px solid var(--gold);padding:11px 18px;border-radius:999px;font-size:14px;font-weight:500;opacity:0;pointer-events:none;transition:.25s;z-index:80;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── PRINT ── */
+@media print{
+  nav,.hero,#sec-concept,.builder-band .left-col,.preview-head,.exports,.selfcheck,
+  #sec-model,footer,#toast,.export-note{display:none!important}
+  body{background:#fff;background-image:none}
+  .builder-band{background:#fff;border:none;padding:0}
+  .builder{display:block}
+  .preview-col{position:static}
+  #badge{box-shadow:none;border:1.5px solid #555;page-break-inside:avoid;max-width:600px;margin:0 auto}
+  @page{margin:18mm}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav>
+  <a class="nav-logo" href="#">
+    <span class="logo-mark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></svg>
+    </span>
+    <span class="logo-text">Authentic AI<br>Disclosure</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#sec-concept">The Idea</a></li>
+    <li><a href="#sec-builder">Build a Label</a></li>
+    <li><a href="#sec-model">The Monash Model</a></li>
+  </ul>
+  <a href="https://marcwatkins.substack.com/" target="_blank" rel="noopener" class="nav-cta">Rhetorica ↗</a>
+</nav>
+
+<!-- ══ HERO ══ -->
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">A digital badging system for honest AI use</div>
+    <h1>Disclose your AI use<br>like a <span class="g">human</span>, not a<br><span class="b">disclaimer.</span></h1>
+    <p class="hero-lead">
+      Authentic disclosure isn't a confession and it isn't a legal log. It's a short, honest account of
+      <strong>how</strong> you worked with AI — written so a reader actually understands what you did.
+      This builder helps you make a clean disclosure label and badge, while steering you away from the two
+      traps: <strong>performative</strong> hedging and <strong>exhaustive</strong> cataloguing.
+    </p>
+    <div class="credit-line">By Marc Watkins · modeled on Monash University</div>
+  </div>
+</header>
+
+<!-- ══ THE IDEA ══ -->
+<section id="sec-concept">
+  <div class="wrap">
+    <div class="sec-kicker">What authentic disclosure means</div>
+    <h2 class="sec-title">Honest, proportionate, human</h2>
+    <p class="sec-intro">Done well, disclosing AI does more than tick a box — it normalizes four things worth protecting in a classroom.</p>
+
+    <div class="principles">
+      <div class="principle">
+        <div class="pic" style="background:var(--blue)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/></svg></div>
+        <h3>Transparency</h3>
+        <p>Say what you used and how — clearly enough that a reader isn't left guessing.</p>
+      </div>
+      <div class="principle">
+        <div class="pic" style="background:var(--green)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-9 8.3 8.5 8.5 0 0 1-3.9-.9L3 20l1.1-3.1A8.38 8.38 0 1 1 21 11.5z"/></svg></div>
+        <h3>Dialogue</h3>
+        <p>Disclosure starts a conversation with your instructor — it isn't a verdict on your character.</p>
+      </div>
+      <div class="principle">
+        <div class="pic" style="background:var(--gold)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></div>
+        <h3>Rapport</h3>
+        <p>Trust is built when honesty is rewarded, not punished. Tell the truth and expect good faith back.</p>
+      </div>
+      <div class="principle">
+        <div class="pic" style="background:var(--red)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <h3>Shared Responsibility</h3>
+        <p>You stay accountable for the final work. The tool helped; the thinking and the choices are yours.</p>
+      </div>
+    </div>
+
+    <div class="traps">
+      <div class="trap perf">
+        <span class="trap-tag">Trap #1 · Avoid</span>
+        <h3>Performative disclosure</h3>
+        <p>Vague, defensive phrasing that <em>signals</em> honesty without actually telling the reader anything. It minimizes, hedges, and hides the real work behind a shrug.</p>
+        <div class="ex">"I just used AI to brainstorm…"</div>
+        <div class="ex">"I used Grammarly to touch it up, but the words are my own…"</div>
+        <div class="ex">"AI gave me some suggestions, but I did most of the writing myself…"</div>
+        <p class="fix"><strong>Do instead:</strong> name the tool, the specific task, and what you changed. Be concrete, not reassuring.</p>
+      </div>
+      <div class="trap exh">
+        <span class="trap-tag">Trap #2 · Avoid</span>
+        <h3>Exhaustive disclosure</h3>
+        <p>The opposite failure: trying to log <em>every</em> keystroke and prompt until disclosure becomes unreadable. A 1,200-word essay does not need a 200-page appendix.</p>
+        <div class="ex">Yasha Hartberg's satirical proposal — that scholars "log every step of the process of composition" — shows how quickly this collapses under its own weight.</div>
+        <p class="fix"><strong>Do instead:</strong> summarize the <em>shape</em> of your AI use proportionately. Keep detailed notes ready if asked, but don't paste them in. See Hartberg, <a href="https://www.chronicle.com/article/ai-writing-disclosures-are-a-joke-heres-how-to-improve-them" target="_blank" rel="noopener">"AI Writing Disclosures Are a Joke"</a> (<em>Chronicle</em>).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ BUILDER ══ -->
+<section id="sec-builder" class="builder-band">
+  <div class="wrap">
+    <div class="sec-kicker">The builder</div>
+    <h2 class="sec-title">Build your disclosure label</h2>
+    <p class="sec-intro">Pick the badge that fits, add a few specifics, and watch your label build itself. Export as HTML, PDF, print, or copy &amp; paste.</p>
+
+    <div class="builder">
+      <!-- FORM -->
+      <div class="panel left-col">
+        <h3 class="step"><span class="step-num">1</span> Choose the badge that fits</h3>
+        <p class="step-hint">How much did AI shape <em>this</em> piece of work? Be honest — bigger isn't worse.</p>
+        <div class="levels" id="levels"></div>
+
+        <h3 class="step" style="margin-top:22px"><span class="step-num">2</span> Add a few specifics</h3>
+        <p class="step-hint">Just enough that a reader understands. Leave blank if you chose "No AI use."</p>
+
+        <div id="detailFields">
+          <label class="fl" for="f-tools">AI tool(s) used</label>
+          <input class="tf" id="f-tools" type="text" placeholder="e.g. ChatGPT, Claude, Grammarly" />
+
+          <label class="fl" for="f-link">Link to the tool <span>(optional — helps if it's lesser-known)</span></label>
+          <input class="tf" id="f-link" type="url" placeholder="https://…" />
+
+          <label class="fl" for="f-purpose">What you used it for</label>
+          <textarea class="tf" id="f-purpose" placeholder="e.g. feedback on my argument and suggestions for clearer transitions"></textarea>
+
+          <div class="two">
+            <div>
+              <label class="fl" for="f-iter">Iterations / drafts <span>(roughly)</span></label>
+              <input class="tf" id="f-iter" type="text" placeholder="e.g. ~3 drafts" />
+            </div>
+            <div>
+              <label class="fl" for="f-mods">How you changed the output</label>
+              <input class="tf" id="f-mods" type="text" placeholder="e.g. rewrote in my own words" />
+            </div>
+          </div>
+
+          <div class="two" style="margin-top:2px">
+            <div>
+              <label class="fl" for="f-name">Your name <span>(optional)</span></label>
+              <input class="tf" id="f-name" type="text" placeholder="Jordan Lee" />
+            </div>
+            <div>
+              <label class="fl" for="f-course">Course / assignment <span>(optional)</span></label>
+              <input class="tf" id="f-course" type="text" placeholder="ENGL 102 — Essay 2" />
+            </div>
+          </div>
+          <p class="muted-note">Tip: aim for one or two sentences. If you feel the urge to list every prompt, that's the <em>exhaustive</em> trap — keep that detail in your own notes instead.</p>
+        </div>
+      </div>
+
+      <!-- PREVIEW -->
+      <div class="preview-col">
+        <div class="preview-head">
+          <span>Your label / badge</span>
+          <span class="live-dot"><i></i> live preview</span>
+        </div>
+
+        <div id="badge"></div>
+
+        <div class="exports">
+          <button class="xbtn primary" id="x-copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy</button>
+          <button class="xbtn blue"    id="x-pdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> PDF</button>
+          <button class="xbtn"         id="x-html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> HTML</button>
+          <button class="xbtn"         id="x-print"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Print</button>
+        </div>
+        <p class="export-note">Copy pastes both rich text and plain text — drop it straight into Word, Google Docs, or your LMS.</p>
+
+        <div class="selfcheck">
+          <h4>Quick self-check</h4>
+          <ul id="checklist"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ THE MONASH MODEL ══ -->
+<section id="sec-model">
+  <div class="wrap">
+    <div class="sec-kicker">Where this comes from</div>
+    <h2 class="sec-title">The Monash model</h2>
+    <p class="sec-intro">
+      This builder adapts Monash University's two-part acknowledgement framework — a widely-used, student-friendly approach to disclosing AI.
+      Full guidance: <a href="https://www.monash.edu/student-academic-success/learning-with-ai/academic-integrity-and-ai/acknowledging-the-use-of-ai" target="_blank" rel="noopener">Acknowledging the use of AI — Monash University</a>.
+    </p>
+
+    <div class="model-grid">
+      <div class="mcard">
+        <h3><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--blue)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Part A — Process documentation</h3>
+        <p>Keep evidence of how the work came together (drafts, notes, key prompts) so you can show your process <em>if asked</em>. Don't paste it into the assignment — hold it in reserve. This is the answer to exhaustive disclosure: depth on demand, not on the page.</p>
+      </div>
+      <div class="mcard">
+        <h3><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="14" y2="18"/></svg> Part B — Concise summary</h3>
+        <p>A brief, plain-language account that goes <em>with</em> the work. Monash suggests you:</p>
+        <ul>
+          <li>name which AI tools you used and for what</li>
+          <li>link tools you found yourself</li>
+          <li>note roughly how many iterations you ran</li>
+          <li>say how you altered, adopted, or built on the output</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="formula">
+      Monash's suggested sentence:&nbsp;
+      I used <span class="slot">AI tool (link)</span> to <span class="slot">how used</span> and <span class="slot">number of iterations/drafts</span>.
+      I modified the outputs in <span class="slot">ways</span>.
+      <br><span style="font-size:13px;color:var(--gray)">If AI was permitted but you chose not to use it: <em>"No content generated by AI technologies has been used in this assessment."</em></span>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h4>About this tool</h4>
+        <p>
+          The <strong>Authentic AI Disclosure</strong> builder was created by
+          <a href="https://marcwatkins.org/home-3/about-me/" target="_blank" rel="noopener">Marc Watkins</a>
+          to help students disclose AI use honestly — without sliding into performative hedging or exhaustive logging.
+          It adapts the acknowledgement framework developed by
+          <a href="https://www.monash.edu/student-academic-success/learning-with-ai/academic-integrity-and-ai/acknowledging-the-use-of-ai" target="_blank" rel="noopener">Monash University</a>,
+          with gratitude.
+        </p>
+        <p><strong>AI disclosure for this tool:</strong> Designed and directed by Marc Watkins and built in conversation with AI (Claude), then reviewed and edited for classroom use.</p>
+      </div>
+      <div>
+        <h4>Read more</h4>
+        <ul class="sources">
+          <li><b>Monash University</b> — <a href="https://www.monash.edu/student-academic-success/learning-with-ai/academic-integrity-and-ai/acknowledging-the-use-of-ai" target="_blank" rel="noopener">Acknowledging the use of AI</a></li>
+          <li><b>Yasha Hartberg</b> — <a href="https://www.chronicle.com/article/ai-writing-disclosures-are-a-joke-heres-how-to-improve-them" target="_blank" rel="noopener">AI Writing Disclosures Are a Joke</a> (<em>Chronicle of Higher Education</em>)</li>
+          <li><b>Marc Watkins</b> — <a href="https://marcwatkins.substack.com/" target="_blank" rel="noopener">Rhetorica</a>, on AI, writing &amp; the classroom</li>
+        </ul>
+      </div>
+    </div>
+    <p class="attrib">Built by Marc Watkins. Framework adapted, with credit, from Monash University. Free to use and adapt for the classroom.</p>
+  </div>
+</footer>
+
+<div id="toast"></div>
+
+<script>
+const LEVELS = [
+  { id:'none',   name:'No AI Use',              color:'#6B6E7E',
+    desc:'AI was permitted, but I chose not to use it.',
+    icon:'<path d="M18 6 6 18M6 6l12 12"/>' },
+  { id:'plan',   name:'Planning & Ideation',    color:'#D4910A',
+    desc:'Brainstorming, outlining, exploring ideas. The writing is mine.',
+    icon:'<path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V18h6v-1.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/>' },
+  { id:'draft',  name:'Drafting & Feedback',    color:'#1B3D85',
+    desc:'AI gave feedback, edits, or suggestions that I reviewed and revised.',
+    icon:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>' },
+  { id:'collab', name:'Collaborative Creation', color:'#C23529',
+    desc:'AI generated substantial content that I edited, verified, and built on.',
+    icon:'<circle cx="9" cy="7" r="3"/><path d="M3 21v-1a5 5 0 0 1 5-5h2a5 5 0 0 1 5 5v1"/><path d="M16 3.1a3 3 0 0 1 0 5.8M21 21v-1a5 5 0 0 0-3-4.6"/>' },
+];
+
+const state = { level:'draft', tools:'', link:'', purpose:'', iter:'', mods:'', name:'', course:'' };
+
+/* build level cards */
+const levelsEl = document.getElementById('levels');
+LEVELS.forEach(l => {
+  const lab = document.createElement('label');
+  lab.className = 'level'; lab.dataset.id = l.id;
+  lab.innerHTML = `
+    <input type="radio" name="level" value="${l.id}" ${l.id===state.level?'checked':''}>
+    <span class="swatch" style="background:${l.color}">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${l.icon}</svg>
+    </span>
+    <span class="ltext"><h4>${l.name}</h4><p>${l.desc}</p></span>`;
+  lab.addEventListener('click', () => { state.level = l.id; lab.querySelector('input').checked = true; render(); });
+  levelsEl.appendChild(lab);
+});
+
+/* wire fields */
+const fieldMap = {tools:'f-tools',link:'f-link',purpose:'f-purpose',iter:'f-iter',mods:'f-mods',name:'f-name',course:'f-course'};
+Object.entries(fieldMap).forEach(([k,id]) => {
+  document.getElementById(id).addEventListener('input', e => { state[k] = e.target.value; render(); });
+});
+
+/* statement generators */
+const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const trimDot = s => { s=(s||'').trim(); return s.replace(/[.\s]+$/, ''); };
+
+function statementText() {
+  if (state.level === 'none') return 'No content generated by AI technologies has been used in this assessment.';
+  const tool = trimDot(state.tools) || 'AI tools';
+  let s = 'I used ' + tool;
+  if (state.link.trim()) s += ' (' + state.link.trim() + ')';
+  if (state.purpose.trim()) s += ' to ' + trimDot(state.purpose);
+  if (state.iter.trim())    s += ', over ' + trimDot(state.iter);
+  s += '. ';
+  if (state.mods.trim()) s += 'I ' + trimDot(state.mods) + ' before submitting this work.';
+  else                   s += 'The final work, and responsibility for it, are my own.';
+  return s;
+}
+
+function statementHTML() {
+  if (state.level === 'none') return esc(statementText());
+  const tool = esc(trimDot(state.tools) || 'AI tools');
+  let s = 'I used ' + tool;
+  if (state.link.trim()) { const u = esc(state.link.trim()); s += ' (<a href="'+u+'">'+u+'</a>)'; }
+  if (state.purpose.trim()) s += ' to ' + esc(trimDot(state.purpose));
+  if (state.iter.trim())    s += ', over ' + esc(trimDot(state.iter));
+  s += '. ';
+  if (state.mods.trim()) s += 'I ' + esc(trimDot(state.mods)) + ' before submitting this work.';
+  else                   s += 'The final work, and responsibility for it, are my own.';
+  return s;
+}
+
+function today() {
+  return new Date().toLocaleDateString('en-US', {year:'numeric', month:'long', day:'numeric'});
+}
+function levelObj() { return LEVELS.find(l => l.id === state.level); }
+
+/* render badge */
+function render() {
+  document.querySelectorAll('.level').forEach(el => el.dataset.active = (el.dataset.id === state.level));
+  const L = levelObj();
+  const showMeta = state.level !== 'none';
+  const rows = showMeta ? [
+    ['Tool(s)', state.tools], ['Purpose', state.purpose],
+    ['Iterations', state.iter], ['What I changed', state.mods],
+  ].filter(r => r[1] && r[1].trim()) : [];
+  const metaHTML = rows.map(r => `<div class="meta-row"><div class="k">${r[0]}</div><div class="v">${esc(r[1].trim())}</div></div>`).join('');
+  const idLine = [state.name.trim(), state.course.trim()].filter(Boolean).map(esc).join(' · ');
+
+  document.getElementById('badge').innerHTML = `
+    <div class="badge-top" style="background:${L.color}">
+      <span class="bicon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${L.icon}</svg></span>
+      <span><div class="btitle">AI Disclosure</div><div class="blevel">${L.name}</div></span>
+    </div>
+    <div class="badge-body">
+      <div class="badge-statement">${statementHTML()}</div>
+      ${metaHTML ? `<div class="badge-meta">${metaHTML}</div>` : ''}
+    </div>
+    <div class="badge-foot">
+      ${idLine ? `<b>${idLine}</b> · ` : ''}${today()}<br>
+      Modeled on Monash University's AI acknowledgement framework · made with Marc Watkins's Authentic Disclosure builder.
+    </div>`;
+
+  renderChecklist();
+}
+
+/* self-check */
+function renderChecklist() {
+  const tick = '<svg viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  const dot  = '<svg viewBox="0 0 24 24" fill="none" stroke="#7a7f97" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/></svg>';
+  let items;
+  if (state.level === 'none') {
+    items = [['You picked the honest badge for not using AI', true], ['Nothing else to add — this statement is complete', true]];
+  } else {
+    const tooLong = (state.purpose.length + state.mods.length) > 320;
+    items = [
+      ['You named the specific tool(s)', !!state.tools.trim()],
+      ['You said what you actually used it for', !!state.purpose.trim()],
+      ['You stated what you changed / how you stayed accountable', !!state.mods.trim()],
+      [tooLong ? 'Trim it — this is drifting toward exhaustive' : 'Proportionate — not too long, not too vague', !tooLong],
+    ];
+  }
+  document.getElementById('checklist').innerHTML = items.map(([t, ok]) =>
+    `<li>${ok ? tick : dot}<span>${t}</span></li>`).join('');
+}
+
+/* export helpers */
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function plainText() {
+  const L = levelObj();
+  let out = `AI DISCLOSURE — ${L.name.toUpperCase()}\n\n${statementText()}\n`;
+  if (state.level !== 'none') {
+    const rows = [['Tool(s)',state.tools],['Purpose',state.purpose],['Iterations',state.iter],['What I changed',state.mods]]
+      .filter(r => r[1] && r[1].trim());
+    if (rows.length) out += '\n' + rows.map(r => `${r[0]}: ${r[1].trim()}`).join('\n') + '\n';
+  }
+  const idLine = [state.name.trim(), state.course.trim()].filter(Boolean).join(' · ');
+  out += `\n${idLine ? idLine + ' · ' : ''}${today()}`;
+  out += `\nModeled on Monash University's AI acknowledgement framework. Made with Marc Watkins's Authentic Disclosure builder.`;
+  return out;
+}
+
+function standaloneHTML() {
+  const L = levelObj();
+  const badge = document.getElementById('badge').outerHTML;
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Disclosure — ${esc(L.name)}</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Inter',system-ui,sans-serif;background:#F5EDD8;margin:0;padding:40px 20px;display:flex;justify-content:center}
+.frame{max-width:560px;width:100%}
+#badge{background:#fff;border:2.5px solid #1A1D2E;border-radius:16px;overflow:hidden;box-shadow:0 6px 0 rgba(26,29,46,.22)}
+.badge-top{padding:16px 20px;color:#fff;display:flex;align-items:center;gap:13px}
+.badge-top .bicon{width:42px;height:42px;border-radius:10px;background:rgba(255,255,255,.18);display:grid;place-items:center;flex-shrink:0;border:2px solid rgba(255,255,255,.5)}
+.badge-top .btitle{font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:12px;opacity:.92}
+.badge-top .blevel{font-family:'Anton',sans-serif;font-size:21px;line-height:1.02;text-transform:uppercase}
+.badge-body{padding:20px}
+.badge-statement{font-size:16px;line-height:1.55;margin-bottom:16px}
+.badge-statement a{color:#1B3D85;word-break:break-word}
+.badge-meta{border-top:1.5px dashed #EDE0C4;padding-top:14px;display:grid;gap:9px}
+.meta-row{display:grid;grid-template-columns:108px 1fr;gap:10px;font-size:13.5px}
+.meta-row .k{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.03em;font-size:11.5px;color:#6B6E7E}
+.meta-row .v{word-break:break-word;color:#1A1D2E}
+.badge-foot{background:#F5EDD8;border-top:1.5px solid #EDE0C4;padding:11px 20px;font-size:11px;color:#6B6E7E;line-height:1.45}
+.badge-foot b{color:#3A3D52}
+</style></head><body><div class="frame">${badge}</div></body></html>`;
+}
+
+function download(name, content, mime) {
+  const blob = new Blob([content], {type: mime});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 100);
+}
+
+function slug() {
+  const L = levelObj();
+  const c = state.course.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return 'ai-disclosure-' + L.id + (c ? '-' + c : '');
+}
+
+/* Copy */
+document.getElementById('x-copy').addEventListener('click', async () => {
+  const L = levelObj();
+  const html = `<div style="font-family:Arial,sans-serif;border:1px solid #ccc;border-radius:10px;overflow:hidden;max-width:560px">
+    <div style="background:${L.color};color:#fff;padding:12px 16px;font-weight:bold">AI Disclosure — ${esc(L.name)}</div>
+    <div style="padding:14px 16px;color:#1A1D2E;font-size:15px;line-height:1.5">${statementHTML()}</div>
+  </div>`;
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      await navigator.clipboard.write([new ClipboardItem({
+        'text/html':  new Blob([html],        {type:'text/html'}),
+        'text/plain': new Blob([plainText()], {type:'text/plain'})
+      })]);
+    } else {
+      await navigator.clipboard.writeText(plainText());
+    }
+    toast('Copied — paste into your document');
+  } catch(e) {
+    const ta = document.createElement('textarea');
+    ta.value = plainText(); document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); ta.remove();
+    toast('Copied as plain text');
+  }
+});
+
+/* HTML download */
+document.getElementById('x-html').addEventListener('click', () => {
+  download(slug() + '.html', standaloneHTML(), 'text/html');
+  toast('HTML file downloaded');
+});
+
+/* Print */
+document.getElementById('x-print').addEventListener('click', () => window.print());
+
+/* PDF */
+document.getElementById('x-pdf').addEventListener('click', () => {
+  const jsPDF = window.jspdf && window.jspdf.jsPDF;
+  if (!jsPDF) { toast('PDF engine loading — using Print instead'); setTimeout(() => window.print(), 400); return; }
+  const L = levelObj();
+  const doc = new jsPDF({unit:'pt', format:'a4'});
+  const M = 56, W = doc.internal.pageSize.getWidth(), CW = W - M*2;
+  let y = 64;
+  const hex = L.color;
+  const rgb = [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)];
+
+  doc.setFillColor(...rgb);
+  doc.roundedRect(M, y, CW, 52, 8, 8, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold'); doc.setFontSize(9);
+  doc.text('AI DISCLOSURE', M+18, y+22);
+  doc.setFontSize(17);
+  doc.text(L.name.toUpperCase(), M+18, y+42);
+  y += 52+28;
+
+  doc.setTextColor(26,29,46);
+  doc.setFont('helvetica','normal'); doc.setFontSize(12.5);
+  const lines = doc.splitTextToSize(statementText(), CW);
+  doc.text(lines, M, y); y += lines.length*17+10;
+
+  if (state.level !== 'none') {
+    const rows = [['Tool(s)',state.tools],['Purpose',state.purpose],['Iterations',state.iter],['What I changed',state.mods]]
+      .filter(r => r[1] && r[1].trim());
+    if (rows.length) {
+      doc.setDrawColor(220,210,185); doc.setLineWidth(1);
+      doc.line(M, y, M+CW, y); y += 18;
+      rows.forEach(r => {
+        doc.setFont('helvetica','bold'); doc.setTextColor(107,110,126); doc.setFontSize(9);
+        doc.text(r[0].toUpperCase(), M, y);
+        doc.setFont('helvetica','normal'); doc.setTextColor(26,29,46); doc.setFontSize(11);
+        const vl = doc.splitTextToSize(r[1].trim(), CW-110);
+        doc.text(vl, M+108, y); y += Math.max(vl.length*14, 16)+4;
+      });
+      y += 6;
+    }
+  }
+
+  const idLine = [state.name.trim(), state.course.trim()].filter(Boolean).join('  ·  ');
+  doc.setDrawColor(220,210,185); doc.line(M, y, M+CW, y); y += 16;
+  doc.setFont('helvetica','bold'); doc.setTextColor(58,61,82); doc.setFontSize(10);
+  if (idLine) { doc.text(idLine, M, y); y += 14; }
+  doc.setFont('helvetica','normal'); doc.setTextColor(120,125,145); doc.setFontSize(8.5);
+  doc.text(today(), M, y); y += 12;
+  const ft = doc.splitTextToSize("Modeled on Monash University's AI acknowledgement framework. Made with Marc Watkins's Authentic Disclosure builder.", CW);
+  doc.text(ft, M, y);
+
+  doc.save(slug() + '.pdf');
+  toast('PDF downloaded');
+});
+
+render();
+</script>
+</body>
+</html>
